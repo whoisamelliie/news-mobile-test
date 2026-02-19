@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -18,16 +18,28 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export function NewsScreen() {
   const navigation = useNavigation<Nav>();
-  const [query, setQuery] = useState('');
+
+  const [search, setSearch] = useState('');
+
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const { data, isLoading, isError, refetch } = useGetArticlesQuery({
     page: 1,
     pageSize: 10,
-    query,
+    query: debouncedSearch,
   });
 
   const items = useMemo(() => data ?? [], [data]);
 
+  // Loading
   if (isLoading) {
     return (
       <Screen className="items-center justify-center">
@@ -36,6 +48,7 @@ export function NewsScreen() {
     );
   }
 
+  // Error
   if (isError) {
     return (
       <Screen className="items-center justify-center px-6">
@@ -59,8 +72,8 @@ export function NewsScreen() {
 
       <View className="px-4 pb-3">
         <TextField
-          value={query}
-          onChangeText={setQuery}
+          value={search}
+          onChangeText={setSearch}
           placeholder="Поиск..."
         />
       </View>
@@ -76,9 +89,11 @@ export function NewsScreen() {
           >
             <View className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
               <Text className="text-base font-semibold">{item.title}</Text>
+
               {item.description ? (
                 <Text className="text-gray-600 mt-2">{item.description}</Text>
               ) : null}
+
               <Text className="text-gray-400 mt-3 text-xs">
                 {item.publishedAt}
               </Text>
