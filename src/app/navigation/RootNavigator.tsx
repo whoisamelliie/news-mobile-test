@@ -9,7 +9,7 @@ import { FavoritesScreen } from '../../pages/favorites';
 export type RootStackParamList = {
   Login: undefined;
   News: undefined;
-  Details: undefined;
+  Details: { url: string };
   Favorites: undefined;
 };
 
