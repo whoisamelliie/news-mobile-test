@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -20,8 +20,10 @@ export function NewsScreen() {
   const navigation = useNavigation<Nav>();
 
   const [search, setSearch] = useState('');
-
   const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  const [page, setPage] = useState(1);
+  const [articles, setArticles] = useState<any[]>([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -31,16 +33,29 @@ export function NewsScreen() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const { data, isLoading, isError, refetch } = useGetArticlesQuery({
-    page: 1,
-    pageSize: 10,
-    query: debouncedSearch,
-  });
+  const { data, isLoading, isError, refetch, isFetching } = useGetArticlesQuery(
+    {
+      page,
+      pageSize: 10,
+      query: debouncedSearch,
+    },
+  );
 
-  const items = useMemo(() => data ?? [], [data]);
+  useEffect(() => {
+    if (!data) return;
 
-  // Loading
-  if (isLoading) {
+    setArticles((prev) => {
+      if (page === 1) return data;
+      return [...prev, ...data];
+    });
+  }, [data, page]);
+
+  useEffect(() => {
+    setPage(1);
+    setArticles([]);
+  }, [debouncedSearch]);
+
+  if (isLoading && page === 1) {
     return (
       <Screen className="items-center justify-center">
         <ActivityIndicator />
@@ -49,7 +64,7 @@ export function NewsScreen() {
   }
 
   // Error
-  if (isError) {
+  if (isError && page === 1) {
     return (
       <Screen className="items-center justify-center px-6">
         <Text className="text-base mb-3">Ошибка загрузки</Text>
@@ -79,9 +94,18 @@ export function NewsScreen() {
       </View>
 
       <FlatList
-        data={items}
+        data={articles}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: 16 }}
+        onEndReached={() => setPage((prev) => prev + 1)}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          isFetching ? (
+            <View style={{ paddingVertical: 16 }}>
+              <ActivityIndicator />
+            </View>
+          ) : null
+        }
         renderItem={({ item }) => (
           <Pressable
             onPress={() => navigation.navigate('Details', { url: item.url })}
