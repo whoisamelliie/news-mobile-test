@@ -13,12 +13,18 @@ import { Screen } from '../../shared/ui/Screen';
 import { TextField } from '../../shared/ui/TextField';
 import { useGetArticlesQuery } from '../../entities/article/api/articlesApi';
 import type { RootStackParamList } from '../../app/navigation/RootNavigator';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToFavorites } from '../../features/favorites/model/favoritesSlice';
+import type { RootState } from '../../app/store/store';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export function NewsScreen() {
   const navigation = useNavigation<Nav>();
-
+  const dispatch = useDispatch();
+  const favoritesCount = useSelector(
+    (state: RootState) => state.favorites.items.length,
+  );
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -46,7 +52,11 @@ export function NewsScreen() {
 
     setArticles((prev) => {
       if (page === 1) return data;
-      return [...prev, ...data];
+
+      const existing = new Set(prev.map((x) => `${x.id}-${x.url}`));
+      const next = data.filter((x) => !existing.has(`${x.id}-${x.url}`));
+
+      return [...prev, ...next];
     });
   }, [data, page]);
 
@@ -83,7 +93,17 @@ export function NewsScreen() {
       <View className="px-4 pt-4 pb-2">
         <Text className="text-2xl font-bold">Новости</Text>
         <Text className="text-gray-500 mt-1">Лента статей</Text>
+        <Text className="text-gray-500 mt-1">
+          В избранном: {favoritesCount}
+        </Text>
       </View>
+
+      <Pressable
+        onPress={() => navigation.navigate('Favorites')}
+        className="mx-4 mb-3 bg-black rounded-xl py-2 items-center"
+      >
+        <Text className="text-white text-sm">Открыть избранное</Text>
+      </Pressable>
 
       <View className="px-4 pb-3">
         <TextField
@@ -95,7 +115,7 @@ export function NewsScreen() {
 
       <FlatList
         data={articles}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => `${item.id}-${item.publishedAt}`}
         contentContainerStyle={{ padding: 16 }}
         onEndReached={() => setPage((prev) => prev + 1)}
         onEndReachedThreshold={0.5}
@@ -121,6 +141,21 @@ export function NewsScreen() {
               <Text className="text-gray-400 mt-3 text-xs">
                 {item.publishedAt}
               </Text>
+
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  dispatch(
+                    addToFavorites({
+                      ...item,
+                      id: item.id ?? item.url,
+                    }),
+                  );
+                }}
+                className="mt-3 bg-black rounded-xl py-2 items-center"
+              >
+                <Text className="text-white text-sm">В избранное</Text>
+              </Pressable>
             </View>
           </Pressable>
         )}

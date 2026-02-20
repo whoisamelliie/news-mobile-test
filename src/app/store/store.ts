@@ -1,12 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { baseApi } from '../../shared/api/baseApi';
+import favoritesReducer from '../../features/favorites/model/favoritesSlice';
+import { articlesApi } from '../../entities/article/api/articlesApi';
 
 export const store = configureStore({
   reducer: {
-    [baseApi.reducerPath]: baseApi.reducer,
+    favorites: favoritesReducer,
+
+    [articlesApi.reducerPath]: articlesApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(baseApi.middleware),
+    getDefaultMiddleware().concat(articlesApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
