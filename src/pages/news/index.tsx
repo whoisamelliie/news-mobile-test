@@ -16,6 +16,7 @@ import type { RootStackParamList } from '../../app/navigation/RootNavigator';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToFavorites } from '../../features/favorites/model/favoritesSlice';
 import type { RootState } from '../../app/store/store';
+import { setAuthFlag } from '../../shared/lib/authStorage';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -97,6 +98,15 @@ export function NewsScreen() {
           В избранном: {favoritesCount}
         </Text>
       </View>
+      <Pressable
+        onPress={async () => {
+          await setAuthFlag(false);
+          navigation.replace('Login');
+        }}
+        className="mt-2 px-4 py-2 rounded-xl bg-black self-start"
+      >
+        <Text className="text-white text-sm font-semibold">Выйти</Text>
+      </Pressable>
 
       <Pressable
         onPress={() => navigation.navigate('Favorites')}

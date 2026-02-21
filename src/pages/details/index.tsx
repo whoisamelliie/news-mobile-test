@@ -1,46 +1,48 @@
 import React from 'react';
-import { Platform, Text, View, Linking, Pressable } from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { Linking, Platform, Pressable, Text, View } from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
+
+import { Screen } from '../../shared/ui/Screen';
 import type { RootStackParamList } from '../../app/navigation/RootNavigator';
 
 type DetailsRoute = RouteProp<RootStackParamList, 'Details'>;
 
 export function DetailsScreen() {
   const route = useRoute<DetailsRoute>();
-  const { url } = route.params;
+  const url = route.params?.url;
+
+  if (!url) {
+    return (
+      <Screen className="items-center justify-center px-6">
+        <Text className="text-base font-semibold">Нет ссылки на статью</Text>
+      </Screen>
+    );
+  }
 
   if (Platform.OS === 'web') {
     return (
-      <View style={{ flex: 1, padding: 16 }}>
-        <Text style={{ fontSize: 18, fontWeight: '700', marginBottom: 8 }}>
-          Статья
-        </Text>
-        <Text style={{ marginBottom: 12 }}>
-          WebView на web-платформе не поддерживается.
+      <Screen className="items-center justify-center px-6">
+        <Text className="text-base font-semibold text-center">
+          Просмотр статьи через WebView недоступен в Web-версии
         </Text>
 
         <Pressable
           onPress={() => Linking.openURL(url)}
-          style={{
-            backgroundColor: '#000',
-            paddingVertical: 12,
-            paddingHorizontal: 16,
-            borderRadius: 12,
-            alignSelf: 'flex-start',
-          }}
+          className="mt-4 px-4 py-2 rounded-xl bg-black"
         >
-          <Text style={{ color: '#fff', fontWeight: '600' }}>
-            Открыть в браузере
-          </Text>
+          <Text className="text-white font-semibold">Открыть статью</Text>
         </Pressable>
-      </View>
+
+        <Text className="text-gray-500 mt-3 text-center text-xs">{url}</Text>
+      </Screen>
     );
   }
 
   return (
     <View style={{ flex: 1 }}>
-      <WebView source={{ uri: url }} />
+      <WebView source={{ uri: url }} startInLoadingState />
     </View>
   );
 }
