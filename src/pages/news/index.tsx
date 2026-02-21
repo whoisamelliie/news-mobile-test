@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Pressable,
   Text,
@@ -17,6 +18,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToFavorites } from '../../features/favorites/model/favoritesSlice';
 import type { RootState } from '../../app/store/store';
 import { setAuthFlag } from '../../shared/lib/authStorage';
+import {
+  scheduleDemoNotification,
+  getExpoPushToken,
+} from '../../shared/lib/notifications';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -33,12 +38,19 @@ export function NewsScreen() {
   const [articles, setArticles] = useState<any[]>([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500);
+    const init = async () => {
+      const token = await getExpoPushToken();
+      if (token) {
+        console.log('Expo Push Token:', token);
+      } else {
+        console.log(
+          'Push token not available (web/simulator or no permissions)',
+        );
+      }
+    };
 
-    return () => clearTimeout(timer);
-  }, [search]);
+    init();
+  }, []);
 
   const { data, isLoading, isError, refetch, isFetching } = useGetArticlesQuery(
     {
@@ -106,6 +118,20 @@ export function NewsScreen() {
         className="mt-2 px-4 py-2 rounded-xl bg-black self-start"
       >
         <Text className="text-white text-sm font-semibold">Выйти</Text>
+      </Pressable>
+      <Pressable
+        onPress={async () => {
+          const ok = await scheduleDemoNotification();
+          if (!ok) {
+            Alert.alert(
+              'Недоступно на Web',
+              'Уведомления работают на iOS/Android',
+            );
+          }
+        }}
+        className="mt-2 px-4 py-2 rounded-xl border border-gray-300 self-start"
+      >
+        <Text className="text-sm font-semibold">Тест уведомления</Text>
       </Pressable>
 
       <Pressable
