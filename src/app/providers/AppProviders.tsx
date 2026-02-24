@@ -1,49 +1,44 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider, useDispatch, useSelector } from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { RootNavigator } from '../navigation/RootNavigator';
-import { store, type RootState } from '../store/store';
+import { store } from '../store/store';
+import type { RootState } from '../store/store';
+
+import {
+  loadFavorites,
+  saveFavorites,
+} from '../../shared/lib/favoritesStorage';
 import { setFavorites } from '../../features/favorites/model/favoritesSlice';
 
-function PersistFavorites() {
+function Bootstrap() {
   const dispatch = useDispatch();
   const favorites = useSelector((state: RootState) => state.favorites.items);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const saved = await AsyncStorage.getItem('favorites');
-        if (saved) {
-          dispatch(setFavorites(JSON.parse(saved)));
-        }
-      } catch (e) {}
+    const init = async () => {
+      const items = await loadFavorites();
+      dispatch(setFavorites(items));
     };
-
-    load();
+    init();
   }, [dispatch]);
 
   useEffect(() => {
-    const save = async () => {
-      try {
-        await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
-      } catch (e) {}
-    };
-
-    save();
+    saveFavorites(favorites);
   }, [favorites]);
 
-  return null;
+  return (
+    <NavigationContainer>
+      <RootNavigator />
+    </NavigationContainer>
+  );
 }
 
 export function AppProviders() {
   return (
     <Provider store={store}>
-      <PersistFavorites />
-      <NavigationContainer>
-        <RootNavigator />
-      </NavigationContainer>
+      <Bootstrap />
     </Provider>
   );
 }

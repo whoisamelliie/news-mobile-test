@@ -3,12 +3,10 @@ import { Alert, FlatList, Pressable, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
-
 import { Screen } from '../../shared/ui/Screen';
 import type { RootState } from '../../app/store/store';
 import type { RootStackParamList } from '../../app/navigation/RootNavigator';
 import { removeFromFavorites } from '../../features/favorites/model/favoritesSlice';
-
 import { pickFile, downloadDemoFile, shareFile } from '../../shared/lib/files';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -77,6 +75,7 @@ export function FavoritesScreen() {
               Alert.alert('Недоступно', 'Скачивание работает на iOS/Android');
               return;
             }
+            Alert.alert('Файл скачан', 'Открою меню “Поделиться”');
             await shareFile(uri);
           }}
           className="mt-3 border border-gray-300 rounded-xl py-3 items-center"

@@ -3,13 +3,16 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
+type PickedFile = {
+  name: string;
+  uri: string;
+};
+
 const FS = FileSystem as unknown as {
   documentDirectory?: string;
   cacheDirectory?: string;
   downloadAsync: typeof FileSystem.downloadAsync;
 };
-
-export type PickedFile = { name: string; uri: string };
 
 export async function pickFile(): Promise<PickedFile | null> {
   if (Platform.OS === 'web') return null;
@@ -21,10 +24,13 @@ export async function pickFile(): Promise<PickedFile | null> {
 
   if (res.canceled) return null;
 
-  const asset = res.assets?.[0];
-  if (!asset) return null;
+  const f = res.assets?.[0];
+  if (!f?.uri) return null;
 
-  return { name: asset.name ?? 'file', uri: asset.uri };
+  return {
+    name: f.name ?? 'file',
+    uri: f.uri,
+  };
 }
 
 export async function downloadDemoFile(): Promise<string | null> {
@@ -35,16 +41,14 @@ export async function downloadDemoFile(): Promise<string | null> {
 
   const url =
     'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
-
   const fileUri = baseDir + 'demo.pdf';
-  const res = await FS.downloadAsync(url, fileUri);
 
+  const res = await FS.downloadAsync(url, fileUri);
   return res.uri;
 }
 
 export async function shareFile(uri: string) {
   if (Platform.OS === 'web') return;
-
   const available = await Sharing.isAvailableAsync();
   if (available) {
     await Sharing.shareAsync(uri);
