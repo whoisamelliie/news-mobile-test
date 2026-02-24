@@ -1,48 +1,163 @@
-# News Mobile Test (React Native)
+# News Mobile Test
 
-## Goal
+## Описание проекта
 
-Cross-platform mobile app: news list (search/filter/infinite scroll), details + WebView, favorites with local storage, push notifications, biometric auth with logout, file upload/download.
+Кроссплатформенное мобильное приложение, разработанное на **Expo + React Native + TypeScript**.
 
-## Stack
+Приложение реализует:
 
-- Expo React Native + TypeScript
-- Feature-Sliced Design (FSD)
+- Список новостей с поиском и пагинацией
+- Экран деталей статьи + открытие оригинала в WebView
+- Избранное с локальным хранением
+- Push-уведомления
+- Биометрическую авторизацию (Face ID / Touch ID) + logout
+- Загрузку и скачивание файлов
+- Архитектуру по принципам Feature-Sliced Design (FSD)
+
+---
+
+## Технологический стек
+
+- Expo (React Native)
+- TypeScript
 - Redux Toolkit + RTK Query
 - React Navigation
 - AsyncStorage
-- WebView
-- Expo Notifications (push)
-- Expo Local Authentication (biometrics)
-- FileSystem + DocumentPicker (download/upload)
+- Expo Notifications
+- Expo Local Authentication
+- Expo FileSystem + DocumentPicker
+- NativeWind (Tailwind для React Native)
+- ESLint + Prettier + Husky
 
-## Setup
+---
+
+## Установка и запуск
+
+### Установка зависимостей
 
 ```bash
 npm install
 ```
 
-## Run the Project
+### Запуск проекта
 
+```bash
 npx expo start
-Then:
-Press a for Android
-Press i for iOS
-Or scan QR code with Expo Go
+```
 
-## Code Quality
+После запуска:
 
-npm run lint
-npm run format
+- Нажмите `a` — запуск на Android
+- Нажмите `i` — запуск на iOS
+- Либо отсканируйте QR-код через Expo Go
 
-## Project Structure
+---
 
-The project follows Feature-Sliced Design (FSD):
+## Архитектура проекта
+
+Проект реализован с использованием **Feature-Sliced Design (FSD)**.
+
 src/
-├── app
-├── processes
-├── pages
-├── widgets
-├── features
-├── entities
-└── shared
+├── app # Провайдеры и конфигурация приложения
+├── processes # Межфичевая логика
+├── pages # Экраны
+├── widgets # Составные UI-блоки
+├── features # Бизнес-функциональность
+├── entities # Доменные модели
+└── shared # Общие утилиты и UI-компоненты
+
+Преимущества выбранного подхода:
+
+- Чёткое разделение ответственности
+- Масштабируемость
+- Изолированная бизнес-логика
+- Поддерживаемость кода
+
+---
+
+## 1️ Инициализация проекта
+
+- Создан Expo-проект с TypeScript
+- Настроена базовая структура
+- Подготовлена архитектура под FSD
+
+---
+
+## 2️ Настройка качества кода
+
+- Подключён ESLint
+- Подключён Prettier
+- Настроен lint-staged
+- Добавлены Husky hooks
+- Обеспечен единый стиль кода
+
+---
+
+## 3️ Настройка состояния и навигации
+
+- Интегрирован Redux Toolkit
+- Настроен глобальный store
+- Подключена React Navigation
+- Реализована базовая навигация между экранами
+
+---
+
+## 4️ Реализация экрана новостей
+
+- Реализован список новостей
+- Добавлен поиск по заголовкам
+- Подготовлена пагинация (infinite scroll)
+- Реализованы состояния загрузки и пустого списка
+
+---
+
+## 5️ Интеграция RTK Query
+
+- Настроен API-слой
+- Реализована загрузка новостей (mock данные)
+- Подготовлена структура для подключения реального API
+
+---
+
+## 6️ Экран "Избранное"
+
+- Реализовано добавление и удаление статей
+- Настроено локальное хранение через AsyncStorage
+- Синхронизация состояния при перезапуске приложения
+
+---
+
+## 7️ Работа с файлами
+
+- Реализована загрузка файла (DocumentPicker)
+- Реализовано скачивание файла (FileSystem)
+- Добавлена возможность поделиться файлом
+- Обработаны ошибки
+
+---
+
+## 8️ Биометрическая авторизация
+
+- Реализован вход через Face ID / Touch ID
+- Добавлен logout
+- Настроено хранение состояния авторизации
+
+---
+
+## 9️ Push-уведомления
+
+- Запрос разрешений
+- Получение push-токена
+- Обработка входящих уведомлений
+- Демонстрационная отправка уведомлений
+
+---
+
+## 10 Стилизация и финальный дизайн
+
+- Интегрирован NativeWind (Tailwind)
+- Исправлены конфигурации babel / metro / tailwind
+- Приведён UI к финальному виду
+- Унифицирована типографика и отступы
+
+---
