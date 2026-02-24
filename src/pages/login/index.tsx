@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  Pressable,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, Platform, Pressable, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as LocalAuthentication from 'expo-local-authentication';
 
 import type { RootStackParamList } from '../../app/navigation/RootNavigator';
 import { setAuthFlag } from '../../shared/lib/authStorage';
+import { GradientScreen } from '../../shared/ui/GradientScreen';
+import { PinkButton } from '../../shared/ui/PinkButton';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -63,7 +58,7 @@ export function LoginScreen() {
       } else {
         Alert.alert('Не удалось', 'Биометрия не подтверждена');
       }
-    } catch (e) {
+    } catch {
       Alert.alert('Ошибка', 'Не удалось выполнить биометрическую проверку');
     } finally {
       setLoading(false);
@@ -71,29 +66,33 @@ export function LoginScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white items-center justify-center px-6">
-      <Text className="text-3xl font-bold mb-2">News App</Text>
-      <Text className="text-gray-500 text-center mb-8">Вход в приложение</Text>
+    <GradientScreen>
+      <View className="flex-1 items-center justify-center px-6">
+        <Text className="text-white text-4xl font-extrabold mb-2">
+          News App ✨
+        </Text>
+        <Text className="text-white/70 text-center mb-8">
+          Вход в приложение
+        </Text>
 
-      <Pressable
-        onPress={login}
-        disabled={loading}
-        className="bg-black px-6 py-3 rounded-xl w-full items-center"
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text className="text-white font-semibold">Войти</Text>
-        )}
-      </Pressable>
+        <View className="w-full p-5 rounded-3xl border border-white/15 bg-white/5">
+          <PinkButton title="Войти" onPress={login} loading={loading} />
 
-      <Pressable
-        onPress={loginWithBiometrics}
-        disabled={loading}
-        className="mt-3 border border-gray-300 px-6 py-3 rounded-xl w-full items-center"
-      >
-        <Text className="font-semibold">Войти по биометрии</Text>
-      </Pressable>
-    </View>
+          <Pressable
+            onPress={loginWithBiometrics}
+            disabled={loading}
+            className="mt-3 w-full items-center py-3.5 rounded-2xl border border-white/20 bg-white/5"
+          >
+            <Text className="font-extrabold text-violet-200">
+              Войти по биометрии 💅
+            </Text>
+          </Pressable>
+
+          <Text className="text-white/50 text-xs text-center mt-4">
+            pink • purple • glossy • pick-me
+          </Text>
+        </View>
+      </View>
+    </GradientScreen>
   );
 }

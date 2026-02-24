@@ -4,8 +4,10 @@ import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 
-import { Screen } from '../../shared/ui/Screen';
 import type { RootStackParamList } from '../../app/navigation/RootNavigator';
+import { GradientScreen } from '../../shared/ui/GradientScreen';
+import { PinkButton } from '../../shared/ui/PinkButton';
+import { GlassButton } from '../../shared/ui/GlassButton';
 
 type DetailsRoute = RouteProp<RootStackParamList, 'Details'>;
 
@@ -15,32 +17,53 @@ export function DetailsScreen() {
 
   if (!url) {
     return (
-      <Screen className="items-center justify-center px-6">
-        <Text className="text-base font-semibold">Нет ссылки на статью</Text>
-      </Screen>
+      <GradientScreen>
+        <View className="flex-1 items-center justify-center px-6">
+          <View className="w-full rounded-3xl p-6 border border-white/15 bg-white/5 items-center">
+            <Text className="text-white text-lg font-extrabold">
+              Нет ссылки на статью
+            </Text>
+            <Text className="text-white/70 mt-2 text-center">
+              Вернись назад и выбери статью
+            </Text>
+          </View>
+        </View>
+      </GradientScreen>
     );
   }
 
   if (Platform.OS === 'web') {
     return (
-      <Screen className="px-4 pt-4">
-        <Text className="text-lg font-bold mb-2">Статья</Text>
-        <Text className="text-gray-600 mb-4">{url}</Text>
+      <GradientScreen>
+        <View className="flex-1 px-4 pt-5">
+          <View className="rounded-3xl p-4 border border-white/15 bg-white/5">
+            <Text className="text-white text-2xl font-extrabold">
+              Статья ✨
+            </Text>
+            <Text className="text-white/70 mt-2" numberOfLines={2}>
+              {url}
+            </Text>
 
-        <Pressable
-          onPress={async () => {
-            const can = await Linking.canOpenURL(url);
-            if (!can) {
-              Alert.alert('Ошибка', 'Не могу открыть ссылку');
-              return;
-            }
-            await Linking.openURL(url);
-          }}
-          className="bg-black rounded-xl py-3 items-center"
-        >
-          <Text className="text-white font-semibold">Открыть в браузере</Text>
-        </Pressable>
-      </Screen>
+            <View className="mt-4">
+              <PinkButton
+                title="Открыть в браузере 🌐"
+                onPress={async () => {
+                  const can = await Linking.canOpenURL(url);
+                  if (!can) {
+                    Alert.alert('Ошибка', 'Не могу открыть ссылку');
+                    return;
+                  }
+                  await Linking.openURL(url);
+                }}
+              />
+            </View>
+
+            <View className="mt-3">
+              <GlassButton title="Назад" onPress={() => history.back()} />
+            </View>
+          </View>
+        </View>
+      </GradientScreen>
     );
   }
 
@@ -50,9 +73,12 @@ export function DetailsScreen() {
         source={{ uri: url }}
         startInLoadingState
         renderLoading={() => (
-          <Screen className="items-center justify-center">
-            <Text>Загрузка...</Text>
-          </Screen>
+          <GradientScreen>
+            <View className="flex-1 items-center justify-center">
+              <Text className="text-white font-extrabold">Загрузка…</Text>
+              <Text className="text-white/70 mt-2">Открываю статью</Text>
+            </View>
+          </GradientScreen>
         )}
       />
     </View>
